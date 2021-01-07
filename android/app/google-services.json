@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "850491199363",
+    "firebase_url": "https://lokomoto-c7830-default-rtdb.firebaseio.com",
+    "project_id": "lokomoto-c7830",
+    "storage_bucket": "lokomoto-c7830.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850491199363:android:b8c8aec4f9a5f46d2eb0b6",
+        "android_client_info": {
+          "package_name": "com.mrsoftit.lokomoto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850491199363-ederqvquahm8jm40ldnk4u28696ropgc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mrsoftit.lokomoto",
+            "certificate_hash": "0d9a083c460665a995e794c032b6b10f479bbbc2"
+          }
+        },
+        {
+          "client_id": "850491199363-ncn4dnl2lcv8j6j2m3952m3hn1kibn8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeBwhCv9Uo1NkgAV0jMtrbxKOK6Jix7fc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850491199363-ncn4dnl2lcv8j6j2m3952m3hn1kibn8f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "850491199363-71gf324uhm5cslmpgd07dh67jqtqv00v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mrsoftit.lokomoto"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850491199363:android:eada7ce82131113e2eb0b6",
+        "android_client_info": {
+          "package_name": "com.mrsoftit.lokomotodriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850491199363-tf1jtoo1rbbc6m2t7rq30vvqcbs89foq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mrsoftit.lokomotodriver",
+            "certificate_hash": "0d9a083c460665a995e794c032b6b10f479bbbc2"
+          }
+        },
+        {
+          "client_id": "850491199363-ncn4dnl2lcv8j6j2m3952m3hn1kibn8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeBwhCv9Uo1NkgAV0jMtrbxKOK6Jix7fc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850491199363-ncn4dnl2lcv8j6j2m3952m3hn1kibn8f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "850491199363-71gf324uhm5cslmpgd07dh67jqtqv00v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mrsoftit.lokomoto"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

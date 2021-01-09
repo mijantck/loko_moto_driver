@@ -211,6 +211,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.4.0"
+  firebase_messaging:
+    dependency: "direct main"
+    description:
+      name: firebase_messaging
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "7.0.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -402,6 +409,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.2+2"
+  maps_toolkit:
+    dependency: "direct main"
+    description:
+      name: maps_toolkit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0+2"
   matcher:
     dependency: transitive
     description:
@@ -645,6 +659,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.12-nullsafety.9"
+  toast:
+    dependency: "direct main"
+    description:
+      name: toast
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
   typed_data:
     dependency: transitive
     description:

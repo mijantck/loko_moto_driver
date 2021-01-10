@@ -1,12 +1,20 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:loko_moto_driver/screens/login.dart';
 import 'package:loko_moto_driver/screens/mainpage.dart';
 import 'package:loko_moto_driver/services/authservice.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'image_detail.dart';
 
+import 'dataprovider.dart';
 import 'globalvariabels.dart';
+
+List<CameraDescription> cameras = [];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +36,12 @@ Future<void> main() async {
       databaseURL: 'https://lokomoto-c7830-default-rtdb.firebaseio.com',
     ),
   );
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    cameras = await availableCameras();
+  } on CameraException catch (e) {
+    print(e);
+  }
   runApp(MaterialApp(
     home: MyApp(),
     debugShowCheckedModeBanner: false,
@@ -38,86 +52,127 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: AuthService().handleAuth(),
+    return ChangeNotifierProvider(
+        create: (context) => AppData(),
+        child: MaterialApp(
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: CameraScreen(),
+          //AuthService().handleAuth(),
+        )
     );
+
+
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
+class CameraScreen extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _CameraScreenState createState() => _CameraScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _CameraScreenState extends State<CameraScreen> {
+  CameraController _controller;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = CameraController(cameras[0], ResolutionPreset.medium);
+    _controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
     });
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<String> _takePicture() async {
+    if (!_controller.value.isInitialized) {
+      print("Controller is not initialized");
+      return null;
+    }
+
+    // Formatting Date and Time
+    String dateTime = DateFormat.yMMMd()
+        .addPattern('-')
+        .add_Hms()
+        .format(DateTime.now())
+        .toString();
+
+    String formattedDateTime = dateTime.replaceAll(' ', '');
+    print("Formatted: $formattedDateTime");
+
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String visionDir = '${appDocDir.path}/Photos/Vision\ Images';
+    await Directory(visionDir).create(recursive: true);
+    final String imagePath = '$visionDir/image_$formattedDateTime.jpg';
+
+    if (_controller.value.isTakingPicture) {
+      print("Processing is progress ...");
+      return null;
+    }
+
+    try {
+      await _controller.takePicture(imagePath);
+    } on CameraException catch (e) {
+      print("Camera Exception: $e");
+      return null;
+    }
+
+    return imagePath;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('ML Vision'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body: _controller.value.isInitialized
+          ? Stack(
+        children: <Widget>[
+          CameraPreview(_controller),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: RaisedButton.icon(
+                icon: Icon(Icons.camera),
+                label: Text("Click"),
+                onPressed: () async {
+                  await _takePicture().then((String path) {
+                    if (path != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(path),
+                        ),
+                      );
+                    }
+                  });
+                },
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+          )
+        ],
+      )
+          : Container(
+        color: Colors.black,
+        child: Center(
+          child: CircularProgressIndicator(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+
+

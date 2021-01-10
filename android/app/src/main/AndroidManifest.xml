@@ -13,6 +13,9 @@
 
        <meta-data android:name="com.google.android.geo.API_KEY"
            android:value="AIzaSyAeBwhCv9Uo1NkgAV0jMtrbxKOK6Jix7fc"/>
+       <meta-data
+           android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+           android:value="ocr,label,barcode,face" />
 
         <activity
             android:name=".MainActivity"

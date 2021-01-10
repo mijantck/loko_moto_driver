@@ -6,10 +6,13 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:loko_moto_driver/datamodels/directiondetails.dart';
+import 'package:loko_moto_driver/datamodels/history.dart';
 import 'package:loko_moto_driver/globalvariabels.dart';
 import 'package:loko_moto_driver/helpers/requesthelper.dart';
 import 'package:loko_moto_driver/widgets/ProgressDialog.dart';
 import 'package:provider/provider.dart';
+
+import '../dataprovider.dart';
 
 class HelperMethods{
 
@@ -85,6 +88,26 @@ class HelperMethods{
       context: context,
       builder: (BuildContext context) => ProgressDialog(status: 'Please wait',),
     );
+  }
+
+  static void getHistoryData(context){
+
+    var keys = Provider.of<AppData>(context, listen: false).tripHistoryKeys;
+
+    for(String key in keys){
+      DatabaseReference historyRef = FirebaseDatabase.instance.reference().child('rideRequest/$key');
+
+      historyRef.once().then((DataSnapshot snapshot) {
+        if(snapshot.value != null){
+
+          var history = History.fromSnapshot(snapshot);
+          Provider.of<AppData>(context, listen: false).updateTripHistory(history);
+
+          print(history.destination);
+        }
+      });
+    }
+
   }
 
   static String formatMyDate(String datestring){

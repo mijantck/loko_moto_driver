@@ -47,29 +47,45 @@ class _DetailScreenState extends State<DetailScreen> {
 
     String mailAddress = '';
     String name = "";
+    String finalname = "";
+    String finalname1 = "";
     String birthday = "";
+    String finalbirthday = "";
+    String finalbirthday1 = "";
     String idnumber = "";
+    String finalidnumber = "";
 
     for (TextBlock block in visionText.blocks) {
       for (TextLine line in block.lines) {
 
-        mailAddress += line.text + ',';
-        for (TextElement element in line.elements) {
-          _elements.add(element);
+        mailAddress += line.text + '\n';
+        if(line.text.startsWith("Name")){
+          name = line.text;
+          finalname = name.replaceAll("Name", "");
+          finalname1  = finalname.replaceAll(new RegExp('\W+'), "");
+
+        } else if(line.text.startsWith("Date of Birth")){
+          birthday = line.text;
+          finalbirthday = birthday.replaceAll("Date of Birth", "");
+
+          finalbirthday1 = finalbirthday.replaceAll(new RegExp('\W+'), "");
+
+        }else if(line.text.startsWith("ID NO")){
+          idnumber = line.text;
+
+          finalidnumber = idnumber.replaceAll(new RegExp(r'[^0-9]'), "");
+
         }
 
-       /* if (regEx.hasMatch(line.text)) {
-          mailAddress += line.text + '\n';
-          for (TextElement element in line.elements) {
-            _elements.add(element);
-          }
+       /* for (TextElement element in line.elements) {
+          _elements.add(element);
         }*/
       }
     }
 
     if (this.mounted) {
       setState(() {
-        recognizedText = mailAddress ;
+        recognizedText = finalname1+" "+" "+finalbirthday1+" "+ finalidnumber;
       });
     }
   }

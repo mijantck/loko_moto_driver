@@ -59,6 +59,8 @@ dependencies:
   path_provider: ^1.6.27
   firebase_ml_vision: ^0.9.3+8
   camera: ^0.5.7+4
+  firebase_storage: ^5.0.1
+  image_picker: ^0.6.7+21
 
 
 

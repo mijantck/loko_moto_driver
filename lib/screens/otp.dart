@@ -4,6 +4,8 @@ import '../screens/mainpage.dart';
 import '../screens/usernamest.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 
+import 'cameraScreen.dart';
+
 class OTPScreen extends StatefulWidget {
   final String phone;
   OTPScreen(this.phone);
@@ -60,7 +62,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     if (value.user != null) {
                       Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (context) => UserNamePage()),
+                          MaterialPageRoute(builder: (context) =>  CameraScreen()),
                               (route) => false);
                     }
                   });
@@ -87,7 +89,7 @@ class _OTPScreenState extends State<OTPScreen> {
             if (value.user != null) {
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => UserNamePage()),
+                  MaterialPageRoute(builder: (context) =>  CameraScreen()),
                       (route) => false);
             }
           });

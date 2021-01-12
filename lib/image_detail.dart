@@ -6,6 +6,8 @@ import 'dart:io';
 import 'dart:ui';
 import 'dart:async';
 
+import 'package:loko_moto_driver/screens/usernamest.dart';
+
 class DetailScreen extends StatefulWidget {
   final String imagePath;
   DetailScreen(this.imagePath);
@@ -14,7 +16,12 @@ class DetailScreen extends StatefulWidget {
   _DetailScreenState createState() => new _DetailScreenState(imagePath);
 }
 
+String finalname = "";
+String finalidnumber = "";
+
+
 class _DetailScreenState extends State<DetailScreen> {
+
   _DetailScreenState(this.path);
 
   final String path;
@@ -47,13 +54,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
     String mailAddress = '';
     String name = "";
-    String finalname = "";
-    String finalname1 = "";
+
     String birthday = "";
     String finalbirthday = "";
-    String finalbirthday1 = "";
     String idnumber = "";
-    String finalidnumber = "";
+
 
     for (TextBlock block in visionText.blocks) {
       for (TextLine line in block.lines) {
@@ -61,20 +66,16 @@ class _DetailScreenState extends State<DetailScreen> {
         mailAddress += line.text + '\n';
         if(line.text.startsWith("Name")){
           name = line.text;
-          finalname = name.replaceAll("Name", "");
-          finalname1  = finalname.replaceAll(new RegExp('\W+'), "");
+          finalname = name.replaceAll("Name ", "");
 
         } else if(line.text.startsWith("Date of Birth")){
           birthday = line.text;
           finalbirthday = birthday.replaceAll("Date of Birth", "");
 
-          finalbirthday1 = finalbirthday.replaceAll(new RegExp('\W+'), "");
-
         }else if(line.text.startsWith("ID NO")){
           idnumber = line.text;
 
           finalidnumber = idnumber.replaceAll(new RegExp(r'[^0-9]'), "");
-
         }
 
        /* for (TextElement element in line.elements) {
@@ -85,7 +86,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
     if (this.mounted) {
       setState(() {
-        recognizedText = finalname1+" "+" "+finalbirthday1+" "+ finalidnumber;
+        recognizedText = "FULL NAME: "+finalname+" ID NUMBER: "+ finalidnumber;
       });
     }
   }
@@ -178,7 +179,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Text(
-                        "Identified emails",
+                        "Identified ",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -193,6 +194,25 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 30,),
+                    Container(
+                      alignment: Alignment.bottomCenter,
+                      child: RaisedButton.icon(
+                        icon: Icon(Icons.arrow_forward_sharp),
+                        label: Text("Click"),
+                        onPressed: () async {
+                          if (finalname != null && finalidnumber != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserNamePage(finalname, finalidnumber),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    )
+
                   ],
                 ),
               ),

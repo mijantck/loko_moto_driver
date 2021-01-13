@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loko_moto_driver/widgets/AlreadyResisterDialog.dart';
+import 'package:loko_moto_driver/widgets/LoadingDialog.dart';
 import 'package:loko_moto_driver/widgets/TaxiButton.dart';
+
 import '../brand_colors.dart';
 import 'dart:io';
 
@@ -27,7 +30,7 @@ class UserNamePage extends StatefulWidget {
 class _UserNamePageState extends State<UserNamePage> {
   _UserNamePageState(this.nameFromMLK, this.NIDFromMLK);
 
-  final String nameFromMLK;
+  String nameFromMLK;
   final String NIDFromMLK;
   Map<dynamic, dynamic> values;
   Set<String> numberSet = new  Set();
@@ -57,25 +60,20 @@ class _UserNamePageState extends State<UserNamePage> {
   var vehicleNumberController = TextEditingController();
   var _name = TextEditingController();
 
-  void updateProfile(context) {
+  void updateProfile(BuildContext context, String url1) {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uid = user.uid;
     final uphone = user.phoneNumber.toString();
-
     DatabaseReference dbRef = FirebaseDatabase.instance.reference().child(
         'drivers/${uid}');
     Map userMap = {
       'NID': NIDFromMLK,
       'fullname': _name.text,
       'phone': uphone,
+      'ImageURL':url1,
     };
     dbRef.set(userMap);
-
-    /*Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => MainPage()),
-            (route) => false);*/
 
     DatabaseReference driverRef =
     FirebaseDatabase.instance.reference().child('drivers/$uid/vehicle_details');
@@ -88,8 +86,11 @@ class _UserNamePageState extends State<UserNamePage> {
 
     driverRef.set(map);
 
-    // Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
-
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => MainPage()),
+          (Route<dynamic> route) => false,
+    );
   }
 
 
@@ -103,27 +104,21 @@ class _UserNamePageState extends State<UserNamePage> {
       }
     });
   }
-
-
   @override
   Widget build(BuildContext context) {
-    _name.value = TextEditingValue(text: nameFromMLK);
-
+    _name.value = TextEditingValue(text: nameFromMLK.replaceAll("Name:", ''));
 
     Future uploadPic(BuildContext context) async {
-      String fileName = basename(_image.path);
+
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference ref = storage.ref().child("image1" + DateTime.now().toString());
       UploadTask uploadTask = ref.putFile(_image);
-      uploadTask.then((res) {
-        url = ref.getDownloadURL().toString();
-      });
+      var imageUrl = await (await uploadTask).ref.getDownloadURL();
+      url = imageUrl.toString();
+      print("ulr4: $url");
 
-      setState(() {
-        print("Profile Picture uploaded");
-        Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text('Profile Picture Uploaded')));
-      });
+      updateProfile(context,url);
+
     }
 
     return Scaffold(
@@ -170,6 +165,7 @@ class _UserNamePageState extends State<UserNamePage> {
                       ),
                       onPressed: () {
                         getImage();
+
                       },
                     ),
                   ),
@@ -278,24 +274,38 @@ class _UserNamePageState extends State<UserNamePage> {
                           return;
                         }
 
-                        isUserRegistered("87807");
 
-                      //
-                          values.forEach((key,values) {
+                        isUserRegistered("87807");
+                          values?.forEach((key,values) {
                             print(values["NID"]);
                             numberSet.add(values["NID"].toString());
                           });
+
                           values.clear();
+
                         if (numberSet.contains(NIDFromMLK)) {
-                          print("have");
                           numberSet.clear();
-
-                          return;
+                          showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) => AlreadyResisterDialog()
+                          );
+                          return ;
                         } else {
-                          print("NO");
                           numberSet.clear();
 
-                          updateProfile(context);
+                          if(_image?.path != null){
+                              showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) => LoadingDialog()
+                          );
+                            uploadPic(context);
+                          }else{
+                            updateProfile(context,url);
+                          }
+
+
                         }
                       },
                     )

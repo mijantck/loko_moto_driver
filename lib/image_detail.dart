@@ -201,13 +201,16 @@ class _DetailScreenState extends State<DetailScreen> {
                         icon: Icon(Icons.arrow_forward_sharp),
                         label: Text("Click"),
                         onPressed: () async {
-                          if (finalname != null && finalidnumber != null) {
+                          if (finalname.length >0 && finalidnumber.length >0) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => UserNamePage(finalname, finalidnumber),
                               ),
                             );
+                          }else{
+                            Scaffold.of(context).showSnackBar(
+                                SnackBar(content: Text('Take a image...')));
                           }
                         },
                       ),

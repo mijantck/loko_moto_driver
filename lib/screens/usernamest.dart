@@ -25,21 +25,27 @@ class UserNamePage extends StatefulWidget {
 }
 
 class _UserNamePageState extends State<UserNamePage> {
-  _UserNamePageState(this.nameFromMLK,this.NIDFromMLK);
+  _UserNamePageState(this.nameFromMLK, this.NIDFromMLK);
+
   final String nameFromMLK;
   final String NIDFromMLK;
+  Map<dynamic, dynamic> values;
+  Set<String> numberSet = new  Set();
 
 
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  String um,uid,una,username;
+  String um, uid, una, username;
   File _image;
   final picker = ImagePicker();
+  String UserVeryfite;
+
   String url = 'https://i.ibb.co/vvkJF5X/simpline.png';
 
-  void showSnackBar(String title){
+  void showSnackBar(String title) {
     final snackbar = SnackBar(
-      content: Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15),),
+      content: Text(
+        title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15),),
     );
     scaffoldKey.currentState.showSnackBar(snackbar);
   }
@@ -51,14 +57,14 @@ class _UserNamePageState extends State<UserNamePage> {
   var vehicleNumberController = TextEditingController();
   var _name = TextEditingController();
 
-  void updateProfile(context){
-
+  void updateProfile(context) {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uid = user.uid;
     final uphone = user.phoneNumber.toString();
 
-    DatabaseReference dbRef = FirebaseDatabase.instance.reference().child('drivers/${uid}');
+    DatabaseReference dbRef = FirebaseDatabase.instance.reference().child(
+        'drivers/${uid}');
     Map userMap = {
       'NID': NIDFromMLK,
       'fullname': _name.text,
@@ -82,7 +88,7 @@ class _UserNamePageState extends State<UserNamePage> {
 
     driverRef.set(map);
 
-   // Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
+    // Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
 
   }
 
@@ -101,23 +107,22 @@ class _UserNamePageState extends State<UserNamePage> {
 
   @override
   Widget build(BuildContext context) {
-
     _name.value = TextEditingValue(text: nameFromMLK);
 
 
-
-    Future uploadPic(BuildContext context) async{
+    Future uploadPic(BuildContext context) async {
       String fileName = basename(_image.path);
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference ref = storage.ref().child("image1" + DateTime.now().toString());
       UploadTask uploadTask = ref.putFile(_image);
       uploadTask.then((res) {
-       url = ref.getDownloadURL().toString();
+        url = ref.getDownloadURL().toString();
       });
 
       setState(() {
         print("Profile Picture uploaded");
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Profile Picture Uploaded')));
+        Scaffold.of(context).showSnackBar(
+            SnackBar(content: Text('Profile Picture Uploaded')));
       });
     }
 
@@ -130,7 +135,8 @@ class _UserNamePageState extends State<UserNamePage> {
             children: <Widget>[
 
               SizedBox(height: 10,),
-              Text('Enter vehicle details', style: TextStyle(fontFamily: 'Brand-Bold', fontSize: 22),),
+              Text('Enter vehicle details',
+                style: TextStyle(fontFamily: 'Brand-Bold', fontSize: 22),),
 
               SizedBox(height: 10,),
               Row(
@@ -145,10 +151,10 @@ class _UserNamePageState extends State<UserNamePage> {
                         child: new SizedBox(
                           width: 180.0,
                           height: 180.0,
-                          child: (_image!=null)?Image.file(
+                          child: (_image != null) ? Image.file(
                             _image,
                             fit: BoxFit.fill,
-                          ):Image.network(url,
+                          ) : Image.network(url,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -193,13 +199,14 @@ class _UserNamePageState extends State<UserNamePage> {
                     ),
                     SizedBox(height: 10,),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(child: Text("NID Number " ,style: TextStyle(fontFamily: 'Brand-Bold', fontSize: 15),),),
-                        Expanded(child: Text(NIDFromMLK ,style: TextStyle(fontFamily: 'Brand-Bold', fontSize: 15),),),
-                      ]
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(child: Text("NID Number ", style: TextStyle(
+                              fontFamily: 'Brand-Bold', fontSize: 15),),),
+                          Expanded(child: Text(NIDFromMLK, style: TextStyle(
+                              fontFamily: 'Brand-Bold', fontSize: 15),),),
+                        ]
                     ),
-
 
 
                     TextField(
@@ -250,36 +257,46 @@ class _UserNamePageState extends State<UserNamePage> {
                     TaxiButton(
                       color: BrandColors.colorGreen,
                       title: 'PROCEED',
-                      onPressed: (){
-
-
-                        if(_name.text.length < 3){
+                      onPressed: () {
+                        if (_name.text.length < 3) {
                           showSnackBar('Please provide name');
                           return;
                         }
 
-                        if(carModelController.text.length < 3){
+                        if (carModelController.text.length < 3) {
                           showSnackBar('Please provide a valid car model');
                           return;
                         }
 
-                        if(carColorController.text.length < 3){
+                        if (carColorController.text.length < 3) {
                           showSnackBar('Please provide a valid car color');
                           return;
                         }
 
-                        if(vehicleNumberController.text.length < 3){
+                        if (vehicleNumberController.text.length < 3) {
                           showSnackBar('Please provide a valid vehicle number');
                           return;
                         }
 
-                        updateProfile(context);
+                        isUserRegistered("87807");
 
-                        if(isUserRegistered(NIDFromMLK) == true){
+                      //
+                          values.forEach((key,values) {
+                            print(values["NID"]);
+                            numberSet.add(values["NID"].toString());
+                          });
+                          values.clear();
+                        if (numberSet.contains(NIDFromMLK)) {
+                          print("have");
+                          numberSet.clear();
 
+                          return;
+                        } else {
+                          print("NO");
+                          numberSet.clear();
+
+                          updateProfile(context);
                         }
-
-
                       },
                     )
 
@@ -294,12 +311,10 @@ class _UserNamePageState extends State<UserNamePage> {
     );
   }
 
-  Future<bool> isUserRegistered(String idToken) async{
-
-    DatabaseReference dbRef = FirebaseDatabase.instance.reference();
-    DataSnapshot dataSnapshot = await dbRef.child('drivers').orderByChild("NID").equalTo(idToken).once();
-
-    print('print: '+dataSnapshot.value);
-    return dataSnapshot.value== null;
+  Future<String> isUserRegistered(String NIDToken) async {
+   var  db = FirebaseDatabase.instance.reference().child("drivers");
+   db.once().then((DataSnapshot snapshot){
+     values = snapshot.value;
+    });
   }
 }

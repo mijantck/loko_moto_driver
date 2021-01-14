@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:loko_moto_driver/screens/cameraScreen.dart';
 import 'package:loko_moto_driver/screens/login.dart';
 import 'package:loko_moto_driver/screens/mainpage.dart';
+import 'package:loko_moto_driver/screens/usernamest.dart';
 import 'package:loko_moto_driver/services/authservice.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: CameraScreen(),
+          home: UserNamePage(),
           //AuthService().handleAuth(),
         )
     );

@@ -109,8 +109,6 @@ class _HomeTabState extends State<HomeTab> {
                 title: availabilityTitle,
                 color: availabilityColor,
                 onPressed: (){
-
-
                   showModalBottomSheet(
                     isDismissible: false,
                     context: context,

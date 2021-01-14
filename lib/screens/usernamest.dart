@@ -19,19 +19,15 @@ import 'mainpage.dart';
 
 
 class UserNamePage extends StatefulWidget {
-    final String nameFromMLK;
-    final String NIDFromMLK;
-    UserNamePage(this.nameFromMLK,this.NIDFromMLK);
+
   @override
-  _UserNamePageState createState() => _UserNamePageState(nameFromMLK,NIDFromMLK);
+  _UserNamePageState createState() => _UserNamePageState();
 
 }
 
 class _UserNamePageState extends State<UserNamePage> {
-  _UserNamePageState(this.nameFromMLK, this.NIDFromMLK);
+  _UserNamePageState();
 
-  String nameFromMLK;
-  final String NIDFromMLK;
   Map<dynamic, dynamic> values;
   Set<String> numberSet = new  Set();
 
@@ -40,10 +36,13 @@ class _UserNamePageState extends State<UserNamePage> {
 
   String um, uid, una, username;
   File _image;
+  File _imageNID;
+  File imageLIST;
   final picker = ImagePicker();
   String UserVeryfite;
 
   String url = 'https://i.ibb.co/vvkJF5X/simpline.png';
+  String urlNID = 'https://i.ibb.co/vvkJF5X/simpline.png';
 
   void showSnackBar(String title) {
     final snackbar = SnackBar(
@@ -59,8 +58,9 @@ class _UserNamePageState extends State<UserNamePage> {
   var carColorController = TextEditingController();
   var vehicleNumberController = TextEditingController();
   var _name = TextEditingController();
+  var NIDNumber = TextEditingController();
 
-  void updateProfile(BuildContext context, String url1) {
+  void updateProfile(BuildContext context, String url1,String url1NID) {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uid = user.uid;
@@ -68,10 +68,11 @@ class _UserNamePageState extends State<UserNamePage> {
     DatabaseReference dbRef = FirebaseDatabase.instance.reference().child(
         'drivers/${uid}');
     Map userMap = {
-      'NID': NIDFromMLK,
+      'NID': NIDNumber.text,
       'fullname': _name.text,
       'phone': uphone,
       'ImageURL':url1,
+      'ImageURLND':url1NID,
     };
     dbRef.set(userMap);
 
@@ -104,22 +105,66 @@ class _UserNamePageState extends State<UserNamePage> {
       }
     });
   }
+  Future getImageNID() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    setState(() {
+      if (pickedFile != null) {
+        _imageNID = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    _name.value = TextEditingValue(text: nameFromMLK.replaceAll("Name:", ''));
-
+  //  _name.value = TextEditingValue(text: nameFromMLK.replaceAll("Name:", ''));
     Future uploadPic(BuildContext context) async {
-
       FirebaseStorage storage = FirebaseStorage.instance;
-      Reference ref = storage.ref().child("image1" + DateTime.now().toString());
-      UploadTask uploadTask = ref.putFile(_image);
-      var imageUrl = await (await uploadTask).ref.getDownloadURL();
-      url = imageUrl.toString();
-      print("ulr4: $url");
+      int i1 = 1;
+      for(var i = 0 ; i <= 1; i++){
+        if(i == 0){
+          print('starrt');
+          Reference ref = storage.ref().child("image1" + DateTime.now().toString());
+          UploadTask uploadTask = ref.putFile(_image);
+          var imageUrl = await (await uploadTask).ref.getDownloadURL();
+          url = imageUrl.toString();
+          print("ulr4: $url");
+          i1 = 1;
+          print('starrt $i1');
+        }else if(i == 1){
+          Reference ref = storage.ref().child("image1" + DateTime.now().toString());
+          UploadTask uploadTask = ref.putFile(_imageNID);
+          var imageUrl = await (await uploadTask).ref.getDownloadURL();
+          urlNID = imageUrl.toString();
+          print("ulr4: $urlNID");
+          i1 = 2;
+          print('starrt $i1');
+        }
+      }
+      if(i1 == 2){
+        updateProfile(context,url,urlNID);
+      }
 
-      updateProfile(context,url);
 
     }
+
+    showLoaderDialog(BuildContext context){
+      AlertDialog alert=AlertDialog(
+        content: new Row(
+          children: [
+            CircularProgressIndicator(),
+            Container(margin: EdgeInsets.only(left: 7),child:Text("Loading..." )),
+          ],),
+      );
+      showDialog(barrierDismissible: false,
+        context:context,
+        builder:(BuildContext context){
+          return alert;
+        },
+      );
+    }
+
+
 
     return Scaffold(
       key: scaffoldKey,
@@ -130,7 +175,7 @@ class _UserNamePageState extends State<UserNamePage> {
             children: <Widget>[
 
               SizedBox(height: 10,),
-              Text('Enter vehicle details',
+              Text('Your Information details',
                 style: TextStyle(fontFamily: 'Brand-Bold', fontSize: 22),),
 
               SizedBox(height: 10,),
@@ -140,12 +185,12 @@ class _UserNamePageState extends State<UserNamePage> {
                   Align(
                     alignment: Alignment.center,
                     child: CircleAvatar(
-                      radius: 100,
+                      radius: 50,
                       backgroundColor: Colors.black12,
                       child: ClipOval(
                         child: new SizedBox(
-                          width: 180.0,
-                          height: 180.0,
+                          width: 100.0,
+                          height: 100.0,
                           child: (_image != null) ? Image.file(
                             _image,
                             fit: BoxFit.fill,
@@ -175,6 +220,44 @@ class _UserNamePageState extends State<UserNamePage> {
                 height: 20.0,
               ),
 
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                Container(
+                  width: 200.0,
+                  height: 100.0,
+                  child: new SizedBox(
+                    width: 200.0,
+                    height: 100.0,
+                    child: (_imageNID != null) ? Image.file(
+                      _imageNID,
+                      fit: BoxFit.fill,
+                    ) : Image.network("https://i.ibb.co/PmCRnzN/smart-card.jpg",
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+
+              ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 60.0),
+                      child: IconButton(
+                        icon: Icon(
+                          FontAwesomeIcons.camera,
+                          size: 30.0,
+                        ),
+                        onPressed: () {
+                          getImageNID();
+
+                        },
+                      ),
+                    ),
+                    ]
+              ),
+
+              SizedBox(
+                height: 20.0,
+              ),
+
               Padding(
                 padding: EdgeInsets.fromLTRB(20, 20, 20, 30),
                 child: Column(
@@ -194,16 +277,19 @@ class _UserNamePageState extends State<UserNamePage> {
                       style: TextStyle(fontSize: 14.0),
                     ),
                     SizedBox(height: 10,),
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(child: Text("NID Number ", style: TextStyle(
-                              fontFamily: 'Brand-Bold', fontSize: 15),),),
-                          Expanded(child: Text(NIDFromMLK, style: TextStyle(
-                              fontFamily: 'Brand-Bold', fontSize: 15),),),
-                        ]
+                    TextField(
+                      controller: NIDNumber,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                          labelText: 'NID Number ',
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.0,
+                          )
+                      ),
+                      style: TextStyle(fontSize: 14.0),
                     ),
-
+                    SizedBox(height: 10,),
 
                     TextField(
                       controller: carModelController,
@@ -273,6 +359,18 @@ class _UserNamePageState extends State<UserNamePage> {
                           showSnackBar('Please provide a valid vehicle number');
                           return;
                         }
+                        if (NIDNumber.text.length < 9) {
+                          showSnackBar('Please provide a valid NID number');
+                          return;
+                        }
+                        if (_imageNID?.path == null) {
+                          showSnackBar('Please provide a NID Image');
+                          return;
+                        }
+                        if (_image?.path == null) {
+                          showSnackBar('Please provide a profile Image');
+                          return;
+                        }
 
 
                         isUserRegistered("87807");
@@ -281,9 +379,9 @@ class _UserNamePageState extends State<UserNamePage> {
                             numberSet.add(values["NID"].toString());
                           });
 
-                          values.clear();
+                          values?.clear();
 
-                        if (numberSet.contains(NIDFromMLK)) {
+                        if (numberSet.contains(NIDNumber.text)) {
                           numberSet.clear();
                           showDialog(
                               context: context,
@@ -293,16 +391,12 @@ class _UserNamePageState extends State<UserNamePage> {
                           return ;
                         } else {
                           numberSet.clear();
+                          if(_image?.path != null && _imageNID?.path != null){
 
-                          if(_image?.path != null){
-                              showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) => LoadingDialog()
-                          );
+                            showLoaderDialog(context);
                             uploadPic(context);
                           }else{
-                            updateProfile(context,url);
+
                           }
 
 

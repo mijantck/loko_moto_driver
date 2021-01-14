@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:brand_colors/brand_colors.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loko_moto_driver/widgets/AvailabilityButton.dart';
+import 'package:loko_moto_driver/widgets/ConfirmSheet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +29,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
     _takePicture();
 
-    _controller = CameraController(cameras[0], ResolutionPreset.medium);
+    _controller = CameraController(cameras[0], ResolutionPreset.high);
     _controller.initialize().then((_) {
       if (!mounted) {
         return;

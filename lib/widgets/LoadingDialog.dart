@@ -27,17 +27,8 @@ class LoadingDialog extends StatelessWidget {
               children: [
                 SizedBox(height: 10,),
 
-                Text('Palace waite same time...', style: TextStyle(fontSize: 18.0, fontFamily: 'Brand-Bold'),),
+                Text('please waite same time...', style: TextStyle(fontSize: 18.0, fontFamily: 'Brand-Bold'),),
 
-                SizedBox(height: 25,),
-
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('please try new NID Card', textAlign: TextAlign.center,),
-                ),
-
-                SizedBox(height: 30,),
-                SizedBox(height: 10,),
 
               ],
             ),

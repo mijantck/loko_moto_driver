@@ -5,7 +5,6 @@ import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'dart:io';
 import 'dart:ui';
 import 'dart:async';
-
 import 'package:loko_moto_driver/screens/usernamest.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -53,6 +52,7 @@ class _DetailScreenState extends State<DetailScreen> {
     RegExp regEx = RegExp(pattern);
 
     String mailAddress = '';
+    String NID_CARD_DEGETAL = '';
     String name = "";
 
     String birthday = "";
@@ -64,20 +64,20 @@ class _DetailScreenState extends State<DetailScreen> {
       for (TextLine line in block.lines) {
 
         mailAddress += line.text + '\n';
+
         if(line.text.startsWith("Name")){
           name = line.text;
-          finalname = name.replaceAll("Name ", "");
+          finalname = name.replaceAll("Name", "");
 
         } else if(line.text.startsWith("Date of Birth")){
           birthday = line.text;
           finalbirthday = birthday.replaceAll("Date of Birth", "");
 
-        }else if(line.text.startsWith("ID NO")){
-          idnumber = line.text;
-
+        }else if(line.text.startsWith("ID NO") || line.text.startsWith("Id NO") ||
+            line.text.startsWith("ID nO") || line.text.startsWith("ID No") ){
+            idnumber = line.text;
           finalidnumber = idnumber.replaceAll(new RegExp(r'[^0-9]'), "");
         }
-
        /* for (TextElement element in line.elements) {
           _elements.add(element);
         }*/
@@ -86,7 +86,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
     if (this.mounted) {
       setState(() {
-        recognizedText = "FULL NAME: "+finalname+" ID NUMBER: "+ finalidnumber;
+        recognizedText = " "+finalname+"\n "+ finalidnumber;
       });
     }
   }
@@ -205,7 +205,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => UserNamePage(finalname, finalidnumber),
+                                builder: (context) => UserNamePage(),
                               ),
                             );
                           }else{

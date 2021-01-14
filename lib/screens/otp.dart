@@ -62,7 +62,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     if (value.user != null) {
                       Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (context) =>  CameraScreen()),
+                          MaterialPageRoute(builder: (context) =>  UserNamePage()),
                               (route) => false);
                     }
                   });
@@ -89,7 +89,7 @@ class _OTPScreenState extends State<OTPScreen> {
             if (value.user != null) {
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) =>  CameraScreen()),
+                  MaterialPageRoute(builder: (context) =>  UserNamePage()),
                       (route) => false);
             }
           });

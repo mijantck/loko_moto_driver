@@ -2,16 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:loko_moto_driver/screens/historypage.dart';
 import 'package:loko_moto_driver/widgets/BrandDivier.dart';
 import 'package:provider/provider.dart';
-
-
 import '../brand_colors.dart';
 import '../dataprovider.dart';
 
-class EarningsTab extends StatelessWidget {
+class EarningsTab extends StatefulWidget {
+
+  @override
+  _EarningsTabState createState() => _EarningsTabState();
+}
+
+class _EarningsTabState extends State<EarningsTab> {
+
+
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+
+    return  Column(
       children: [
+
         Container(
           color: BrandColors.colorPrimary,
           width: double.infinity,
@@ -19,9 +28,8 @@ class EarningsTab extends StatelessWidget {
             padding:  EdgeInsets.symmetric(vertical: 70),
             child: Column(
               children: [
-
                 Text('Total Earnings', style: TextStyle(color: Colors.white),),
-                Text('\$${Provider.of<AppData>(context).earnings}', style: TextStyle(color: Colors.white, fontSize: 40, fontFamily: 'Brand-Bold'),)
+                Text('\৳${Provider.of<AppData>(context).earnings}', style: TextStyle(color: Colors.white, fontSize: 40, fontFamily: 'Brand-Bold'),)
               ],
             ),
           ),
@@ -37,7 +45,7 @@ class EarningsTab extends StatelessWidget {
             padding:  EdgeInsets.symmetric(horizontal: 30, vertical: 18),
             child: Row(
               children: [
-                Image.asset('images/taxi.png', width: 70,),
+                Image.asset('images/moto.png', width: 70,),
                 SizedBox(width: 16,),
                 Text('Trips', style: TextStyle(fontSize: 16), ),
                 Expanded(child: Container(child: Text(Provider.of<AppData>(context).tripCount.toString(), textAlign: TextAlign.end, style: TextStyle(fontSize: 18),))),

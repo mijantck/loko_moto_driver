@@ -61,6 +61,7 @@ dependencies:
   camera: ^0.5.7+4
   firebase_storage: ^5.0.1
   image_picker: ^0.6.7+21
+  url_launcher: ^5.7.10
 
 
 

@@ -279,7 +279,8 @@ class _UserNamePageState extends State<UserNamePage> {
                     SizedBox(height: 10,),
                     TextField(
                       controller: NIDNumber,
-                      keyboardType: TextInputType.text,
+                      keyboardType: TextInputType.number,
+
                       decoration: InputDecoration(
                           labelText: 'NID Number ',
                           hintStyle: TextStyle(

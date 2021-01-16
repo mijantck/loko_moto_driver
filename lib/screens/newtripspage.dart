@@ -15,6 +15,7 @@ import 'package:loko_moto_driver/helpers/mapkithelper.dart';
 import 'package:loko_moto_driver/widgets/CollectPaymentDialog.dart';
 import 'package:loko_moto_driver/widgets/ProgressDialog.dart';
 import 'package:loko_moto_driver/widgets/TaxiButton.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NewTripPage extends StatefulWidget {
 
@@ -64,8 +65,8 @@ class _NewTripPageState extends State<NewTripPage> {
       ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: Size(2,2));
       BitmapDescriptor.fromAssetImage(
           imageConfiguration, (Platform.isIOS)
-          ? 'images/car_ios.png'
-          : 'images/car_android.png'
+          ? 'images/moto.png'
+          : 'images/moto.png'
       ).then((icon){
         movingMarkerIcon = icon;
       });
@@ -159,10 +160,16 @@ class _NewTripPageState extends State<NewTripPage> {
                       children: <Widget>[
                         Text(widget.tripDetails.riderName, style: TextStyle(fontSize: 22, fontFamily: 'Brand-Bold'),),
 
-                        Padding(
-                          padding: EdgeInsets.only(right: 10),
-                          child: Icon(Icons.call),
+                        GestureDetector(
+                          onTap: (){
+                            launch(('tel://${widget.tripDetails.riderPhone}'));
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 10),
+                            child: Icon(Icons.call),
+                          ),
                         ),
+
 
                       ],
                     ),
@@ -188,7 +195,6 @@ class _NewTripPageState extends State<NewTripPage> {
                     ),
 
                     SizedBox(height: 15,),
-
 
                     Row(
                       children: <Widget>[
@@ -277,6 +283,7 @@ class _NewTripPageState extends State<NewTripPage> {
     rideRef.child('car_details').set('${currentDriverInfo.carColor} - ${currentDriverInfo.carModel}');
     rideRef.child('driver_phone').set(currentDriverInfo.phone);
     rideRef.child('driver_id').set(currentDriverInfo.id);
+    rideRef.child('driver_ImageURL').set(currentDriverInfo.ImageURL);
 
     Map locationMap = {
       'latitude': currentPosition.latitude.toString(),
@@ -493,9 +500,10 @@ class _NewTripPageState extends State<NewTripPage> {
 
   void endTrip() async {
 
-    timer.cancel();
+   // timer.cancel();
 
     HelperMethods.showProgressDialog(context);
+    print('end');
 
     var currentLatLng = LatLng(myPosition.latitude, myPosition.longitude);
 
@@ -535,12 +543,12 @@ class _NewTripPageState extends State<NewTripPage> {
 
         double oldEarnings = double.parse(snapshot.value.toString());
 
-        double adjustedEarnings = (fares.toDouble() * 0.85) + oldEarnings;
+        double adjustedEarnings = (fares.toDouble() * 5) + oldEarnings;
 
         earningsRef.set(adjustedEarnings.toStringAsFixed(2));
       }
       else{
-        double adjustedEarnings = (fares.toDouble() * 0.85);
+        double adjustedEarnings = (fares.toDouble() * 5);
         earningsRef.set(adjustedEarnings.toStringAsFixed(2));
       }
 

@@ -90,6 +90,47 @@ class HelperMethods{
     );
   }
 
+  static void getHistoryInfo (context){
+
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User user = auth.currentUser;
+    final uidu = user.uid;
+
+    DatabaseReference earningRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/earnings');
+
+    earningRef.once().then((DataSnapshot snapshot){
+      if(snapshot.value != null){
+        String earnings = snapshot.value.toString();
+        Provider.of<AppData>(context, listen: false).updateEarnings(earnings);
+      }
+
+    });
+
+    DatabaseReference historyRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/history');
+    historyRef.once().then((DataSnapshot snapshot) {
+
+      if(snapshot.value != null){
+
+        Map<dynamic, dynamic> values = snapshot.value;
+        int tripCount = values.length;
+
+        // update trip count to data provider
+        Provider.of<AppData>(context, listen: false).updateTripCount(tripCount);
+
+        List<String> tripHistoryKeys = [];
+        values.forEach((key, value) {tripHistoryKeys.add(key);});
+
+        // update trip keys to data provider
+        Provider.of<AppData>(context, listen: false).updateTripKeys(tripHistoryKeys);
+
+        getHistoryData(context);
+
+      }
+    });
+
+
+  }
+
   static void getHistoryData(context){
 
     var keys = Provider.of<AppData>(context, listen: false).tripHistoryKeys;

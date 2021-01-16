@@ -8,6 +8,7 @@ class Driver{
   String carModel;
   String carColor;
   String vehicleNumber;
+  String ImageURL;
 
   Driver({
     this.fullName,
@@ -17,12 +18,14 @@ class Driver{
     this.carModel,
     this.carColor,
     this.vehicleNumber,
+    this.ImageURL,
   });
 
   Driver.fromSnapshot(DataSnapshot snapshot){
     id = snapshot.key;
     phone = snapshot.value['phone'];
     email = snapshot.value['email'];
+    ImageURL = snapshot.value['ImageURL'];
     fullName = snapshot.value['fullname'];
     carModel = snapshot.value['vehicle_details']['car_model'];
     carColor = snapshot.value['vehicle_details']['car_color'];

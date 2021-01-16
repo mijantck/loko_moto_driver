@@ -60,8 +60,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: UserNamePage(),
-          //AuthService().handleAuth(),
+          home: AuthService().handleAuth(),
         )
     );
 

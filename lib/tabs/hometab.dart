@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loko_moto_driver/datamodels/driver.dart';
 import 'package:loko_moto_driver/helpers/helpermethods.dart';
 import 'package:loko_moto_driver/helpers/pushnotificationservice.dart';
+import 'package:loko_moto_driver/screens/usernamest.dart';
 import 'package:loko_moto_driver/widgets/AvailabilityButton.dart';
 import 'package:loko_moto_driver/widgets/ConfirmSheet.dart';
 
@@ -26,6 +27,7 @@ class _HomeTabState extends State<HomeTab> {
   Completer<GoogleMapController> _controller = Completer();
 
   DatabaseReference tripRequestRef;
+  String name;
 
   var geoLocator = Geolocator();
   var locationOptions = LocationOptions(accuracy: LocationAccuracy.bestForNavigation, distanceFilter: 4);
@@ -45,15 +47,13 @@ class _HomeTabState extends State<HomeTab> {
 
   }
 
-  void getCurrentDriverInfo () async {
 
+  void getCurrentDriverInfo () async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uidu = user.uid;
-
     DatabaseReference driverRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}');
     driverRef.once().then((DataSnapshot snapshot){
-
       if(snapshot.value != null){
         currentDriverInfo = Driver.fromSnapshot(snapshot);
         print(currentDriverInfo.fullName);
@@ -65,7 +65,34 @@ class _HomeTabState extends State<HomeTab> {
     pushNotificationService.initialize(context);
     pushNotificationService.getToken();
 
-   // HelperMethods.getHistoryInfo(context);
+    HelperMethods.getHistoryInfo(context);
+  }
+
+  void getOnlieInfo(){
+
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User user = auth.currentUser;
+    final uidu = user.uid;
+    tripRequestRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/newtrip');
+    tripRequestRef.once().then((DataSnapshot snapshot){
+      if(snapshot.value != null){
+        getLocationUpdates();
+        setState(() {
+          availabilityColor = BrandColors.colorGreen;
+          availabilityTitle = 'GO OFFLINE';
+          isAvailable = true;
+        });
+      }else{
+        setState(() {
+          availabilityColor = BrandColors.colorOrange;
+          availabilityTitle = 'GO ONLINE';
+          isAvailable = false;
+        });
+      }
+    });
+
+
+
   }
 
 
@@ -74,6 +101,7 @@ class _HomeTabState extends State<HomeTab> {
     // TODO: implement initState
     super.initState();
     getCurrentDriverInfo();
+    getOnlieInfo();
   }
 
   @override
@@ -90,6 +118,7 @@ class _HomeTabState extends State<HomeTab> {
             _controller.complete(controller);
             mapController = controller;
             getCurrentPosition();
+
           },
         ),
         Container(
@@ -120,25 +149,10 @@ class _HomeTabState extends State<HomeTab> {
 
                         if(!isAvailable){
                           GoOnline();
-                          getLocationUpdates();
-                          Navigator.pop(context);
-
-                          setState(() {
-                            availabilityColor = BrandColors.colorGreen;
-                            availabilityTitle = 'GO OFFLINE';
-                            isAvailable = true;
-                          });
-
                         }
                         else{
-
                           GoOffline();
-                          Navigator.pop(context);
-                          setState(() {
-                            availabilityColor = BrandColors.colorOrange;
-                            availabilityTitle = 'GO ONLINE';
-                            isAvailable = false;
-                          });
+
                         }
 
                       },
@@ -159,27 +173,52 @@ class _HomeTabState extends State<HomeTab> {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uidu = user.uid;
+     name = currentDriverInfo?.fullName;
 
-    Geofire.initialize('driversAvailable');
-    Geofire.setLocation(uidu, currentPosition.latitude, currentPosition.longitude);
+    if( name != null ){
+      print('info');
+      Geofire.initialize('driversAvailable');
+      Geofire.setLocation(uidu, currentPosition.latitude, currentPosition.longitude);
+      tripRequestRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/newtrip');
+      tripRequestRef.set('waiting');
+      tripRequestRef.onValue.listen((event) {
+      });
+      getLocationUpdates();
+      Navigator.pop(context);
 
-    tripRequestRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/newtrip');
-    tripRequestRef.set('waiting');
+      setState(() {
+        availabilityColor = BrandColors.colorGreen;
+        availabilityTitle = 'GO OFFLINE';
+        isAvailable = true;
+      });
+    }else{
 
-    tripRequestRef.onValue.listen((event) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => UserNamePage()),
+      );
 
-    });
+    }
+
 
   }
 
   void GoOffline (){
+
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uidu = user.uid;
     Geofire.removeLocation(uidu);
-    tripRequestRef.onDisconnect();
+    tripRequestRef?.onDisconnect();
     tripRequestRef.remove();
     tripRequestRef = null;
+
+    Navigator.pop(context);
+    setState(() {
+      availabilityColor = BrandColors.colorOrange;
+      availabilityTitle = 'GO ONLINE';
+      isAvailable = false;
+    });
 
   }
 

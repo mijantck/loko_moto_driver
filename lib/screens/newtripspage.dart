@@ -65,8 +65,8 @@ class _NewTripPageState extends State<NewTripPage> {
       ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: Size(2,2));
       BitmapDescriptor.fromAssetImage(
           imageConfiguration, (Platform.isIOS)
-          ? 'images/moto.png'
-          : 'images/moto.png'
+          ? 'images/car_ios.png'
+          : 'images/car_android.png'
       ).then((icon){
         movingMarkerIcon = icon;
       });
@@ -159,17 +159,17 @@ class _NewTripPageState extends State<NewTripPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(widget.tripDetails.riderName, style: TextStyle(fontSize: 22, fontFamily: 'Brand-Bold'),),
-
                         GestureDetector(
-                          onTap: (){
+                          onTap: () async {
                             launch(('tel://${widget.tripDetails.riderPhone}'));
                           },
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10),
-                            child: Icon(Icons.call),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                               Icon(Icons.call),
+                            ],
                           ),
-                        ),
-
+                        )
 
                       ],
                     ),
@@ -195,6 +195,7 @@ class _NewTripPageState extends State<NewTripPage> {
                     ),
 
                     SizedBox(height: 15,),
+
 
                     Row(
                       children: <Widget>[
@@ -275,7 +276,6 @@ class _NewTripPageState extends State<NewTripPage> {
     final uidu = user.uid;
 
     String rideID = widget.tripDetails.rideID;
-
     rideRef = FirebaseDatabase.instance.reference().child('rideRequest/$rideID');
 
     rideRef.child('status').set('accepted');
@@ -283,7 +283,6 @@ class _NewTripPageState extends State<NewTripPage> {
     rideRef.child('car_details').set('${currentDriverInfo.carColor} - ${currentDriverInfo.carModel}');
     rideRef.child('driver_phone').set(currentDriverInfo.phone);
     rideRef.child('driver_id').set(currentDriverInfo.id);
-    rideRef.child('driver_ImageURL').set(currentDriverInfo.ImageURL);
 
     Map locationMap = {
       'latitude': currentPosition.latitude.toString(),
@@ -503,7 +502,6 @@ class _NewTripPageState extends State<NewTripPage> {
    // timer.cancel();
 
     HelperMethods.showProgressDialog(context);
-    print('end');
 
     var currentLatLng = LatLng(myPosition.latitude, myPosition.longitude);
 
@@ -532,23 +530,20 @@ class _NewTripPageState extends State<NewTripPage> {
   }
 
   void topUpEarnings(int fares){
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final User user = auth.currentUser;
-    final uidu = user.uid;
 
-    DatabaseReference earningsRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/earnings');
+    DatabaseReference earningsRef = FirebaseDatabase.instance.reference().child('drivers/${currentFirebaseUser.uid}/earnings');
     earningsRef.once().then((DataSnapshot snapshot) {
 
       if(snapshot.value != null){
 
         double oldEarnings = double.parse(snapshot.value.toString());
 
-        double adjustedEarnings = (fares.toDouble() * 5) + oldEarnings;
+        double adjustedEarnings = (fares.toDouble() * 0.85) + oldEarnings;
 
         earningsRef.set(adjustedEarnings.toStringAsFixed(2));
       }
       else{
-        double adjustedEarnings = (fares.toDouble() * 5);
+        double adjustedEarnings = (fares.toDouble() * 0.85);
         earningsRef.set(adjustedEarnings.toStringAsFixed(2));
       }
 

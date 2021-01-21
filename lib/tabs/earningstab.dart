@@ -5,20 +5,10 @@ import 'package:provider/provider.dart';
 import '../brand_colors.dart';
 import '../dataprovider.dart';
 
-class EarningsTab extends StatefulWidget {
-
-  @override
-  _EarningsTabState createState() => _EarningsTabState();
-}
-
-class _EarningsTabState extends State<EarningsTab> {
-
-
-
+class EarningsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    return  Column(
+    return Column(
       children: [
 
         Container(
@@ -28,6 +18,7 @@ class _EarningsTabState extends State<EarningsTab> {
             padding:  EdgeInsets.symmetric(vertical: 70),
             child: Column(
               children: [
+
                 Text('Total Earnings', style: TextStyle(color: Colors.white),),
                 Text('\৳${Provider.of<AppData>(context).earnings}', style: TextStyle(color: Colors.white, fontSize: 40, fontFamily: 'Brand-Bold'),)
               ],

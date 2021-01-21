@@ -27,7 +27,6 @@ class _HomeTabState extends State<HomeTab> {
   Completer<GoogleMapController> _controller = Completer();
 
   DatabaseReference tripRequestRef;
-  String name;
 
   var geoLocator = Geolocator();
   var locationOptions = LocationOptions(accuracy: LocationAccuracy.bestForNavigation, distanceFilter: 4);
@@ -47,13 +46,16 @@ class _HomeTabState extends State<HomeTab> {
 
   }
 
-
   void getCurrentDriverInfo () async {
+
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uidu = user.uid;
+
+
     DatabaseReference driverRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}');
     driverRef.once().then((DataSnapshot snapshot){
+
       if(snapshot.value != null){
         currentDriverInfo = Driver.fromSnapshot(snapshot);
         print(currentDriverInfo.fullName);
@@ -62,6 +64,7 @@ class _HomeTabState extends State<HomeTab> {
     });
 
     PushNotificationService pushNotificationService = PushNotificationService();
+
     pushNotificationService.initialize(context);
     pushNotificationService.getToken();
 
@@ -76,7 +79,6 @@ class _HomeTabState extends State<HomeTab> {
     tripRequestRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/newtrip');
     tripRequestRef.once().then((DataSnapshot snapshot){
       if(snapshot.value != null){
-        getLocationUpdates();
         setState(() {
           availabilityColor = BrandColors.colorGreen;
           availabilityTitle = 'GO OFFLINE';
@@ -95,13 +97,12 @@ class _HomeTabState extends State<HomeTab> {
 
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCurrentDriverInfo();
     getOnlieInfo();
+    getCurrentDriverInfo();
   }
 
   @override
@@ -117,8 +118,8 @@ class _HomeTabState extends State<HomeTab> {
           onMapCreated: (GoogleMapController controller){
             _controller.complete(controller);
             mapController = controller;
-            getCurrentPosition();
 
+            getCurrentPosition();
           },
         ),
         Container(
@@ -138,6 +139,8 @@ class _HomeTabState extends State<HomeTab> {
                 title: availabilityTitle,
                 color: availabilityColor,
                 onPressed: (){
+
+
                   showModalBottomSheet(
                     isDismissible: false,
                     context: context,
@@ -149,10 +152,25 @@ class _HomeTabState extends State<HomeTab> {
 
                         if(!isAvailable){
                           GoOnline();
+                          getLocationUpdates();
+                          Navigator.pop(context);
+
+                          setState(() {
+                            availabilityColor = BrandColors.colorGreen;
+                            availabilityTitle = 'GO OFFLINE';
+                            isAvailable = true;
+                          });
+
                         }
                         else{
-                          GoOffline();
 
+                          GoOffline();
+                          Navigator.pop(context);
+                          setState(() {
+                            availabilityColor = BrandColors.colorOrange;
+                            availabilityTitle = 'GO ONLINE';
+                            isAvailable = false;
+                          });
                         }
 
                       },
@@ -170,55 +188,32 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   void GoOnline(){
+
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uidu = user.uid;
-     name = currentDriverInfo?.fullName;
 
-    if( name != null ){
-      print('info');
-      Geofire.initialize('driversAvailable');
-      Geofire.setLocation(uidu, currentPosition.latitude, currentPosition.longitude);
-      tripRequestRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/newtrip');
-      tripRequestRef.set('waiting');
-      tripRequestRef.onValue.listen((event) {
-      });
-      getLocationUpdates();
-      Navigator.pop(context);
+    Geofire.initialize('driversAvailable');
+    Geofire.setLocation(uidu, currentPosition.latitude, currentPosition.longitude);
 
-      setState(() {
-        availabilityColor = BrandColors.colorGreen;
-        availabilityTitle = 'GO OFFLINE';
-        isAvailable = true;
-      });
-    }else{
+    tripRequestRef = FirebaseDatabase.instance.reference().child('drivers/${uidu}/newtrip');
+    tripRequestRef.set('waiting');
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => UserNamePage()),
-      );
+    tripRequestRef.onValue.listen((event) {
 
-    }
-
+    });
 
   }
 
   void GoOffline (){
-
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser;
     final uidu = user.uid;
+
     Geofire.removeLocation(uidu);
-    tripRequestRef?.onDisconnect();
+    tripRequestRef.onDisconnect();
     tripRequestRef.remove();
     tripRequestRef = null;
-
-    Navigator.pop(context);
-    setState(() {
-      availabilityColor = BrandColors.colorOrange;
-      availabilityTitle = 'GO ONLINE';
-      isAvailable = false;
-    });
 
   }
 
@@ -230,9 +225,11 @@ class _HomeTabState extends State<HomeTab> {
 
     homeTabPositionStream = geoLocator.getPositionStream(locationOptions).listen((Position position) {
       currentPosition = position;
+
       if(isAvailable){
         Geofire.setLocation(uidu, position.latitude, position.longitude);
       }
+
       LatLng pos = LatLng(position.latitude, position.longitude);
       mapController.animateCamera(CameraUpdate.newLatLng(pos));
 

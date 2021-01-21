@@ -38,7 +38,7 @@ class NotificationDialog extends StatelessWidget {
 
             SizedBox(height: 30.0,),
 
-            Image.asset('images/taxi.png', width: 100,),
+            Image.asset('images/car_iso.png', width: 100,),
 
             SizedBox(height: 16.0,),
 

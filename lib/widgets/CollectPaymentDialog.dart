@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:loko_moto_driver/helpers/helpermethods.dart';
 import 'package:loko_moto_driver/widgets/BrandDivier.dart';
